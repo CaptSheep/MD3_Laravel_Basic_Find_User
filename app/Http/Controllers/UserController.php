@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -14,8 +15,14 @@ class UserController extends Controller
 
     public function search(Request $request)
     {
-        $user = User::find($request->input('user_id'));
+        {
+            try {
+                $user = User::findOrFail($request->input('user_id'));
+            } catch (ModelNotFoundException $exception) {
+                return back()->withErrors($exception->getMessage())->withInput();
+            }
 
-        return view('users.search', compact('user'));
+            return view('users.search', compact('user'));
+        }
     }
 }
